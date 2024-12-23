@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Основные стили */
+        body {
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+
+        }
+
+        h1 {
+            color: #343a40;
+            font-weight: bold;
+        }
+
+        .card {
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-body {
+            background: linear-gradient(135deg, #ffffff, #e9eff6);
+            border-radius: 8px;
+        }
+
+        footer {
+            background: #343a40;
+            color: #fff;
+        }
+
+        footer a {
+            color: #f8f9fa;
+            text-decoration: underline;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">Сканер уязвимостей</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link active" href="index.html">Главная</a></li>
+                <li class="nav-item"><a class="nav-link" href="scan.html">Сканирование</a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html">Отчеты</a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html">Настройки</a></li>
+                <li class="nav-item"><a class="nav-link" href="hosts_groups.html">Хосты/Группы</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-5">
+    <h1 class="text-center">Добро пожаловать!</h1>
+    <p class="text-center text-muted">Превосходное решение для управления безопасностью сети.</p>
+
+    <!-- Карточки с градиентами -->
+    <div class="row text-center mt-5">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <i class="bi bi-shield-lock text-primary" style="font-size: 2.5rem;"></i>
+                    <h5 class="card-title mt-3">Сканирование</h5>
+                    <p class="card-text">Проведите сканирование для поиска уязвимостей вашей инфраструктуры.</p>
+                    <a href="scan.html" class="btn btn-primary">Начать</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-bar-graph text-success" style="font-size: 2.5rem;"></i>
+                    <h5 class="card-title mt-3">Отчеты</h5>
+                    <p class="card-text">Просмотрите результаты сканирования и получите рекомендации.</p>
+                    <a href="reports.html" class="btn btn-success">Открыть</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <i class="bi bi-gear-fill text-secondary" style="font-size: 2.5rem;"></i>
+                    <h5 class="card-title mt-3">Настройки</h5>
+                    <p class="card-text">Настройте параметры системы под свои нужды.</p>
+                    <a href="settings.html" class="btn btn-secondary">Перейти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="text-center p-3">
+    <p>&copy; 2024 Система управления сканированием. Сделано с заботой о безопасности. <a href="https://example.com">Узнать
+        больше</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

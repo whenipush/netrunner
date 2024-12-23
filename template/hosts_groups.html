@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хосты/Группы</title>
+    <script type="module" src="js/hosts_groups.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            font-family: 'Arial', sans-serif;
+        }
+        h1 {
+            color: #343a40;
+            font-weight: bold;
+        }
+        footer {
+            background: #343a40;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">Сканер уязвимостей</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">Главная</a></li>
+                <li class="nav-item"><a class="nav-link" href="scan.html">Сканирование</a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html">Отчеты</a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html">Настройки</a></li>
+                <li class="nav-item"><a class="nav-link active" href="hosts_groups.html">Хосты/Группы</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <h1 class="h3 text-center">Хосты и группы</h1>
+    <p class="text-center text-muted">Управляйте хостами и группами для удобной организации сканирования.</p>
+
+    <!-- Список хостов -->
+    <section class="my-5">
+        <h4>Список хостов</h4>
+        <ul class="list-group" id="hostsList"></ul>
+    </section>
+
+    <!-- Форма добавления хоста -->
+    <section class="mb-5">
+        <h4>Добавить хост</h4>
+        <form id="addHostForm" class="mb-3">
+            <div class="mb-3">
+                <label for="hostIP" class="form-label">IP-адрес или имя хоста</label>
+                <input type="text" class="form-control" id="hostIP" placeholder="Введите IP или имя хоста" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить хост</button>
+        </form>
+    </section>
+
+    <!-- Список групп -->
+    <section class="my-5">
+        <h4>Список групп</h4>
+        <ul class="list-group" id="groupsList"></ul>
+    </section>
+
+    <!-- Форма создания группы -->
+    <section class="mb-5">
+        <h4>Создать группу</h4>
+        <form id="createGroupForm" class="mb-3">
+            <div class="mb-3">
+                <label for="groupName" class="form-label">Название группы</label>
+                <input type="text" class="form-control" id="groupName" placeholder="Введите название группы" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Создать группу</button>
+        </form>
+    </section>
+</div>
+
+<footer class="bg-dark text-white text-center p-3">
+    <p>&copy; 2024 Система управления сканированием. Все права защищены.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

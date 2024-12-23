@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сканирование</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Сканер уязвимостей</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="index.html">Главная</a></li>
+        <li class="nav-item"><a class="nav-link active" href="scan.html">Сканирование</a></li>
+        <li class="nav-item"><a class="nav-link" href="reports.html">Отчеты</a></li>
+        <li class="nav-item"><a class="nav-link" href="settings.html">Настройки</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <h1 class="h3 text-center">Сканирование</h1>
+
+  <!-- Вкладки для разделов Nmap и SQLmap -->
+  <ul class="nav nav-tabs mb-4" id="scanTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="nmap-tab" data-bs-toggle="tab" data-bs-target="#nmap" type="button" role="tab" aria-controls="nmap" aria-selected="true">Nmap</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="sqlmap-tab" data-bs-toggle="tab" data-bs-target="#sqlmap" type="button" role="tab" aria-controls="sqlmap" aria-selected="false">SQLmap</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="scanTabsContent">
+    <!-- Вкладка Nmap -->
+    <div class="tab-pane fade show active" id="nmap" role="tabpanel" aria-labelledby="nmap-tab">
+      <h4 class="mb-3">Сканирование Nmap</h4>
+      <form>
+        <div class="mb-3">
+          <label for="nmapTarget" class="form-label">Цель (IP/сеть)</label>
+          <input type="text" class="form-control" id="nmapTarget" placeholder="Введите адрес или сеть">
+        </div>
+        <div class="mb-3">
+          <label for="nmapOptions" class="form-label">Опции Nmap</label>
+          <input type="text" class="form-control" id="nmapOptions" placeholder="Например: -sS -p 1-1000">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="startNmapScan()">Запустить Nmap</button>
+      </form>
+    </div>
+
+    <!-- Вкладка SQLmap -->
+    <div class="tab-pane fade" id="sqlmap" role="tabpanel" aria-labelledby="sqlmap-tab">
+      <h4 class="mb-3">Сканирование SQLmap</h4>
+      <form>
+        <div class="mb-3">
+          <label for="sqlmapTarget" class="form-label">URL-адрес</label>
+          <input type="url" class="form-control" id="sqlmapTarget" placeholder="Введите URL">
+        </div>
+        <div class="mb-3">
+          <label for="sqlmapOptions" class="form-label">Опции SQLmap</label>
+          <input type="text" class="form-control" id="sqlmapOptions" placeholder="Например: --dbs --dump">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="startSqlmapScan()">Запустить SQLmap</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer class="bg-dark text-white text-center p-3">
+  <p>&copy; 2024 Система управления сканированием. Все права защищены.</p>
+</footer>
+
+<script>
+  function startNmapScan() {
+    const target = document.getElementById("nmapTarget").value;
+    const options = document.getElementById("nmapOptions").value;
+    if (target) {
+      alert(`Запускаем Nmap с целью: ${target} и опциями: ${options}`);
+      // Здесь можно отправить данные на сервер или выполнить дальнейшие действия
+    } else {
+      alert("Введите цель для Nmap!");
+    }
+  }
+
+  function startSqlmapScan() {
+    const target = document.getElementById("sqlmapTarget").value;
+    const options = document.getElementById("sqlmapOptions").value;
+    if (target) {
+      alert(`Запускаем SQLmap для URL: ${target} с опциями: ${options}`);
+      // Здесь можно отправить данные на сервер или выполнить дальнейшие действия
+    } else {
+      alert("Введите URL для SQLmap!");
+    }
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

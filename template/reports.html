@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отчеты</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Сканер уязвимостей</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="index.html">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" href="scan.html">Сканирование</a></li>
+        <li class="nav-item"><a class="nav-link active" href="reports.html">Отчеты</a></li>
+        <li class="nav-item"><a class="nav-link" href="settings.html">Настройки</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <h1 class="h3">Отчеты</h1>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Имя отчета</th>
+      <th>Дата</th>
+      <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>1</td>
+      <td>Сканирование сети 192.168.0.0</td>
+      <td>23.12.2024</td>
+      <td><button class="btn btn-sm btn-info">Просмотр</button></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer class="bg-dark text-white text-center p-3">
+  <p>&copy; 2024 Система управления сканированием. Все права защищены.</p>
+</footer>
+</body>
+</html>
