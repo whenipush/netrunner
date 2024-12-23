@@ -7,6 +7,7 @@ import (
 	"netrunner/database"
 )
 
+// kek
 func main() {
 	database.Connect()
 	r := gin.Default()
