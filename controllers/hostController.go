@@ -48,6 +48,17 @@ func GetAllHost(c *gin.Context) {
 	c.JSON(http.StatusOK, hosts)
 }
 
+func GetHostByID(c *gin.Context) {
+	ip := c.Query("ip")
+	var host models.Host
+
+	if err := database.DB.Preload("Groups").Where("ip = ?", ip).First(&host).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Host not found"})
+		return
+	}
+	c.JSON(http.StatusOK, host)
+}
+
 // UpdateHost - изменяет хост по ID.
 
 func UpdateHost(c *gin.Context) {

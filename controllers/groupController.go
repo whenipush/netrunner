@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"net/http"
 	"netrunner/database"
 	"netrunner/models"
 
@@ -30,6 +31,17 @@ func GetAllGroup(c *gin.Context) {
 	}
 
 	c.JSON(200, groups)
+}
+
+func GetGroupByName(c *gin.Context) {
+	name := c.Query("group")
+	var host models.Group
+
+	if err := database.DB.Preload("Hosts").Where("name = ?", name).First(&name).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Host not found"})
+		return
+	}
+	c.JSON(http.StatusOK, host)
 }
 
 func UpdateGroup(c *gin.Context) {

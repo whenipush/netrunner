@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+type SQLmapRequest struct {
+	Target  string            `json:"target" binding:"required"` // URL для сканирования
+	Options map[string]string `json:"options"`                   // Дополнительные параметры для SQLmap
+}
+
 // Эндпоинт для запуска SQLmap
 func RunSQLmap(c *gin.Context) {
 	var req SQLmapRequest

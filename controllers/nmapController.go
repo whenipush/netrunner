@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,51 +15,76 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SQLmapRequest struct {
-	Target  string            `json:"target" binding:"required"` // URL для сканирования
-	Options map[string]string `json:"options"`                   // Дополнительные параметры для SQLmap
-}
-
 type NmapRequest struct {
 	Hosts  []string `form:"hosts" binding:"required"`
 	Script string   `form:"script" binding:"required"`
 }
 
 func startNmap(host string, script string) {
-	// Заглушка для запуска nmap
-
-	// nmap -sV --script vuln -oX scan_results.xml 192.168.20.218
+	// Получение текущей даты
 	currentTime := time.Now()
 	currentDate := currentTime.Format("2006-01-02")
 
 	// Формирование имени файла отчёта
 	report := fmt.Sprintf("report/report_%s.xml", currentDate)
 
-	// Формирование команды NMap
-	nmapCmd := exec.Command("nmap", "-sV", "--script", "vuln", "-oX", report, host)
+	// Формирование команды NMap с --stats-every
+	nmapCmd := exec.Command("nmap", "-sV", "--stats-every", "5s", "-oX", report, host)
 
-	// Выполнение команды
-	output, err := nmapCmd.CombinedOutput()
+	// Захват stdout и stderr
+	stdout, err := nmapCmd.StdoutPipe()
 	if err != nil {
+		log.Println("Ошибка получения stdout:", err)
+		return
+	}
+
+	stderr, err := nmapCmd.StderrPipe()
+	if err != nil {
+		log.Println("Ошибка получения stderr:", err)
+		return
+	}
+
+	// Запуск команды
+	if err := nmapCmd.Start(); err != nil {
 		log.Println("Ошибка запуска NMap:", err)
 		return
 	}
 
-	// Вывод результата
+	// Потоковая обработка вывода stdout
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			fmt.Println("[NMap STDOUT]:", scanner.Text())
+		}
+	}()
+
+	// Потоковая обработка вывода stderr
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			fmt.Println("[NMap STDERR]:", scanner.Text())
+		}
+	}()
+
+	// Ожидание завершения команды
+	if err := nmapCmd.Wait(); err != nil {
+		log.Println("Ошибка выполнения команды NMap:", err)
+		return
+	}
+
+	// Сообщение об успешном завершении
 	fmt.Println("Результаты NMap сохранены в файл:", report)
-	fmt.Println(string(output))
-	fmt.Println(script)
-
+	fmt.Println("Скрипт:", script)
 }
-func ProcessNmapRequest(c *gin.Context) {
 
+func ProcessNmapRequest(c *gin.Context) {
 	var input NmapRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"response": "Запрос в обработке"})
+	c.JSON(http.StatusOK, gin.H{"response": "Задача отправлена"})
 
 	go func() {
 		for _, host := range input.Hosts {

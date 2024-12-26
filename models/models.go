@@ -13,3 +13,10 @@ type Host struct {
 	IP     string  `gorm:"type:varchar(255);unique_index" json:"ip"`
 	Groups []Group `gorm:"many2many:group_hosts"`
 }
+
+type TaskStatus struct {
+	gorm.Model
+	Status  string `json:"status"`
+	Host    string `json:"host,omitempty"`
+	Message string `json:"message,omitempty"`
+}

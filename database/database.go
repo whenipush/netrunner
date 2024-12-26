@@ -20,7 +20,7 @@ func Connect() {
 		log.Println("Database connected successfully!")
 	}
 
-	// Автоматическая миграция модели Cocktail
+	// Автоматическая миграция модели
 	DB.AutoMigrate(&models.Host{}, &models.Group{})
 
 }
