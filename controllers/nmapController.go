@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"netrunner/database"
+	"netrunner/models"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -15,9 +18,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: ДОДЕЛАТЬ СОЗДАНИЕ ЗАДАЧИ
 type NmapRequest struct {
-	Hosts  []string `form:"hosts" binding:"required"`
-	Script string   `form:"script" binding:"required"`
+	Hosts   []string `form:"hosts" binding:"required"`
+	Script  string   `form:"script" binding:"required"`
+	Name    string   `json:"name" binding:"required"`
+	Status  string   `json:"status"`
+	Percent float32  `json:"percent"`
 }
 
 func startNmap(host string, script string) {
@@ -49,12 +56,18 @@ func startNmap(host string, script string) {
 		log.Println("Ошибка запуска NMap:", err)
 		return
 	}
+	percentRegex := regexp.MustCompile(`About (\d+(\.\d+)?)%`)
 
 	// Потоковая обработка вывода stdout
 	go func() {
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
-			fmt.Println("[NMap STDOUT]:", scanner.Text())
+			//fmt.Println("[NMap STDOUT]:", scanner.Text())
+			line := scanner.Text()
+			if matches := percentRegex.FindStringSubmatch(line); matches != nil {
+				percent := matches[1] // Достаем процент выполнения
+				fmt.Printf("Прогресс: %s%% завершено\n", percent)
+			}
 		}
 	}()
 
@@ -73,6 +86,7 @@ func startNmap(host string, script string) {
 	}
 
 	// Сообщение об успешном завершении
+	fmt.Println("100%")
 	fmt.Println("Результаты NMap сохранены в файл:", report)
 	fmt.Println("Скрипт:", script)
 }
@@ -84,11 +98,17 @@ func ProcessNmapRequest(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
+	if err := database.DB.Create(&input).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"response": "Задача отправлена"})
 
 	go func() {
 		for _, host := range input.Hosts {
 			startNmap(host, input.Script)
+
 		}
 		log.Println("Сделано!")
 	}()
@@ -190,4 +210,16 @@ func GetAllNmap(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"files": filePaths})
+}
+
+func GetTaskStatus(c *gin.Context) {
+	numberTask := c.Param("number_task")
+	var task models.TaskStatus
+
+	if err := database.DB.Where("number_task = ?", numberTask).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, task)
 }

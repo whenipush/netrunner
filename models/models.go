@@ -16,7 +16,20 @@ type Host struct {
 
 type TaskStatus struct {
 	gorm.Model
-	Status  string `json:"status"`
-	Host    string `json:"host,omitempty"`
-	Message string `json:"message,omitempty"`
+	NumberTask string  `gorm:"type:varchar(255);unique_index" json:"number_task"` // Автоматическая генерация
+	Name       string  `gorm:"type:varchar(255);unique_index" json:"name"`
+	Status     string  `gorm:"default:pending" json:"status"`
+	Percent    float32 `gorm:"default:0" json:"percent"`
+	Hosts      []Host  `gorm:"many2many:task_hosts" json:"hosts"`
+	Script     string  `json:"script"`
+}
+
+func (task *TaskStatus) BeforeCreate(tx *gorm.DB) (err error) {
+	if task.Status == "" {
+		task.Status = "pending"
+	}
+	if task.Percent == 0 {
+		task.Percent = 0.0
+	}
+	return
 }

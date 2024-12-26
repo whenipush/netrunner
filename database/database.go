@@ -21,6 +21,6 @@ func Connect() {
 	}
 
 	// Автоматическая миграция модели
-	DB.AutoMigrate(&models.Host{}, &models.Group{})
+	DB.AutoMigrate(&models.Host{}, &models.Group{}, &models.TaskStatus{})
 
 }

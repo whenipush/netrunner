@@ -12,10 +12,10 @@ func main() {
 	database.Connect()
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:63342"},        // Разрешите фронтенд
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},  // Разрешенные методы
-		AllowHeaders:     []string{"Content-Type", "Authorization"}, // Разрешенные заголовки
-		AllowCredentials: true,                                      // Разрешите использование куки/сессий
+		AllowOrigins:     []string{"http://localhost:63342"},                // Разрешите фронтенд
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, // Разрешенные методы
+		AllowHeaders:     []string{"Content-Type", "Authorization"},         // Разрешенные заголовки
+		AllowCredentials: true,                                              // Разрешите использование куки/сессий
 	}))
 
 	// Host endpoints
