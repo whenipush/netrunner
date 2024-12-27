@@ -19,8 +19,8 @@ func main() {
 	}))
 
 	// Host endpoints
-	r.GET("/api/v1/host", controllers.GetAllHost)
-	r.GET("/api/v1/host-by-name", controllers.GetHostByID) // Получить все хосты
+	r.GET("/api/v1/host", controllers.GetAllHost)          // Получить все хосты
+	r.GET("/api/v1/host-by-name", controllers.GetHostByID) // Хост по имени
 	r.POST("/api/v1/host", controllers.CreateHost)         // Создать новый хост
 	r.PUT("/api/v1/host/:id", controllers.UpdateHost)      // Изменить хост по ID
 	r.DELETE("/api/v1/host/:id", controllers.DeleteHost)   // Удалить хост по ID
@@ -36,15 +36,16 @@ func main() {
 	// Host-Group endpoints
 	r.POST("/api/v1/host-add-group", controllers.AddHostToGroupHandler) // Добавить хосты к группам
 
-	// other endpoints
+	// other endpoints nmap
 
 	r.POST("/api/v1/upload-script", controllers.UploadScript) // Загрузить скрипт nmap на сервер
-	r.POST("/api/v1/nmap", controllers.ProcessNmapRequest)    // Запустить nmap на указанных хостах с указанным скриптом
+	r.POST("/api/v1/nmap", controllers.ProcessNmapRequest)
+	r.GET("/api/v1/task-status/:number_task", controllers.GetTaskStatus)
+	r.DELETE("/api/v1/task/:number_task", controllers.DeleteTask)
+	r.GET("/api/v1/task-all", controllers.GetTaskAll)
 
 	// Получение результатов Nmap
-
 	r.GET("/api/v1/last-nmap", controllers.GetLastNmap)
-
 	r.GET("/api/v1/all-nmap", controllers.GetAllNmap)
 	//r.GET("/api/v1/name-nmap/:filename", controllers.GetReportByName)
 

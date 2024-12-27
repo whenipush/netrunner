@@ -7,42 +7,20 @@
     <script type="module" src="js/hosts_groups.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/header_footer.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Arial', sans-serif;
-        }
         h1 {
             color: #343a40;
             font-weight: bold;
         }
-        footer {
-            background: #343a40;
-            color: #fff;
-        }
+
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">Сканер уязвимостей</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="index.html">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="scan.html">Сканирование</a></li>
-                <li class="nav-item"><a class="nav-link" href="reports.html">Отчеты</a></li>
-                <li class="nav-item"><a class="nav-link" href="settings.html">Настройки</a></li>
-                <li class="nav-item"><a class="nav-link active" href="hosts_groups.html">Хосты/Группы</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div class="container my-4"  style="margin-left: 250px;">
+    <h1 class="text-dark fw-bold text-center">Хосты и группы</h1>
 
-<div class="container my-4">
-    <h1 class="h3 text-center">Хосты и группы</h1>
     <p class="text-center text-muted">Управляйте хостами и группами для удобной организации сканирования.</p>
 
     <!-- Список хостов -->
@@ -81,11 +59,6 @@
         </form>
     </section>
 </div>
-
-<footer class="bg-dark text-white text-center p-3">
-    <p>&copy; 2024 Система управления сканированием. Все права защищены.</p>
-</footer>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

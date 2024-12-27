@@ -6,16 +6,10 @@
     <title>Главная</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/header_footer.js" defer></script>
     <style>
         /* Основные стили */
-        body {
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-
-        }
 
         h1 {
             color: #343a40;
@@ -37,41 +31,10 @@
             border-radius: 8px;
         }
 
-        footer {
-            background: #343a40;
-            color: #fff;
-        }
-
-        footer a {
-            color: #f8f9fa;
-            text-decoration: underline;
-        }
-        main {
-            flex: 1;
-        }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">Сканер уязвимостей</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link active" href="index.html">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="scan.html">Сканирование</a></li>
-                <li class="nav-item"><a class="nav-link" href="reports.html">Отчеты</a></li>
-                <li class="nav-item"><a class="nav-link" href="settings.html">Настройки</a></li>
-                <li class="nav-item"><a class="nav-link" href="hosts_groups.html">Хосты/Группы</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<main class="container my-5">
+<main class="container my-5" style="margin-left: 300px;">
     <h1 class="text-center">Добро пожаловать!</h1>
     <p class="text-center text-muted">Превосходное решение для управления безопасностью сети.</p>
 
@@ -109,12 +72,6 @@
         </div>
     </div>
 </main>
-
-<footer class="text-center p-3">
-    <p>&copy; 2024 Система управления сканированием. Сделано с заботой о безопасности. <a href="https://example.com">Узнать
-        больше</a></p>
-</footer>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

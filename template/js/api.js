@@ -129,6 +129,11 @@ const NmapAPI = {
         if (!response.ok) throw new Error("Ошибка получения всех результатов Nmap");
         return response.json();
     },
+    async getAllTasks() {
+        const response = await fetch(`${API_BASE_URL}/task-all`);
+        if (!response.ok) throw new Error("Ошибка получения всех результатов Nmap");
+        return response.json();
+    },
 };
 
 export { HostAPI, GroupAPI, HostGroupAPI, NmapAPI };
