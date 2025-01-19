@@ -11,12 +11,15 @@ import (
 func main() {
 	database.Connect()
 	r := gin.Default()
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:63342"},                // Разрешите фронтенд
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, // Разрешенные методы
-		AllowHeaders:     []string{"Content-Type", "Authorization"},         // Разрешенные заголовки
-		AllowCredentials: true,                                              // Разрешите использование куки/сессий
-	}))
+	// govno
+	//r.Use(cors.New(cors.Config{
+	//	AllowOrigins:     []string{"http://localhost:5500"},                 // Разрешите фронтенд
+	//	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, // Разрешенные методы
+	//	AllowHeaders:     []string{"Content-Type", "Authorization"},         // Разрешенные заголовки
+	//	AllowCredentials: true,                                              // Разрешите использование куки/сессий
+	//}))
+
+	r.Use(cors.Default())
 
 	// Host endpoints
 	r.GET("/api/v1/host", controllers.GetAllHost)          // Получить все хосты
@@ -31,7 +34,7 @@ func main() {
 	r.POST("/api/v1/group", controllers.CreateGroup)            // Создать новую группу
 	r.PUT("/api/v1/group/:id", controllers.UpdateGroup)         // Изменить группу по ID
 	r.DELETE("/api/v1/group/:id", controllers.DeleteGroup)      // Удалить группу по ID
-	r.GET("/api/v1/group-by-name/", controllers.GetGroupByName) // Удалить группу по ID
+	r.GET("/api/v1/group-by-name/", controllers.GetGroupByName) // Удалить группу по name
 
 	// Host-Group endpoints
 	r.POST("/api/v1/host-add-group", controllers.AddHostToGroupHandler) // Добавить хосты к группам
@@ -49,6 +52,10 @@ func main() {
 	r.GET("/api/v1/all-nmap", controllers.GetAllNmap)
 	//r.GET("/api/v1/name-nmap/:filename", controllers.GetReportByName)
 
-	r.Run(":3000")
+	// Загружаем 2 файла БДУ ФСТЭКА, сохраняем и обрабатываем
+	// Не трогать, тут как часики работает
+	r.POST("/api/v1/update-database-bdu", controllers.UploadDatabaseBDU)
+	r.GET("/api/v1/ws", controllers.HandleWebSocket)
+	r.Run(":3001")
 
 }

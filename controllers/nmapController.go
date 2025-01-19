@@ -2,125 +2,66 @@ package controllers
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"netrunner/database"
-	"netrunner/handlers"
 	"netrunner/models"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-// TODO: ДОДЕЛАТЬ СОЗДАНИЕ ЗАДАЧИ // СДЕЛАНО
-// TODO: Выбор скрипта
-// TODO: Переписать получение отчета
-type NmapRequest struct {
-	Hosts   []string `form:"hosts" binding:"required"`
-	Group   string   `form:"group" binding:"required"`
-	Script  string   `form:"script" binding:"required"`
-	Name    string   `json:"name" binding:"required"`
-	Status  string   `json:"status"`
-	Percent float32  `json:"percent"`
+// / Константы для статусов задач
+const (
+	StatusPending   = "pending"
+	StatusCompleted = "completed"
+	StatusError     = "error"
+)
+
+// Типы параметров для задач
+type NmapParams struct {
+	Ports  string `json:"ports"`
+	Script string `json:"script"`
 }
 
-func startNmap(host string, script string, taskID uint) {
-	log_name := fmt.Sprintf("TASK-%d", taskID)
-	logger, err := handlers.LogNmapError(log_name)
-	if err != nil {
-		log.Fatalf("Ошибка создания логгера: %v", err)
-	}
-	// Получение текущей даты
-	currentTime := time.Now()
-	currentDate := currentTime.Format("2006-01-02")
-
-	// Формирование имени файла отчёта
-	report := fmt.Sprintf("report/report-task%d-%s.xml", taskID, currentDate)
-
-	// Формирование команды NMap с --stats-every
-	nmapCmd := exec.Command("nmap", "-sV", "--stats-every", "5s", "-oX", report, host)
-
-	// Захват stdout и stderr
-	stdout, err := nmapCmd.StdoutPipe()
-	if err != nil {
-		log.Println("Ошибка получения stdout:", err)
-		logger.Println("Ошибка получения stdout:", err)
-		return
-	}
-
-	stderr, err := nmapCmd.StderrPipe()
-	if err != nil {
-		log.Println("Ошибка получения stderr:", err)
-		logger.Println("Ошибка получения stderr:", err)
-		return
-	}
-
-	// Запуск команды
-	if err := nmapCmd.Start(); err != nil {
-		log.Println("Ошибка запуска NMap:", err)
-		logger.Println("Ошибка запуска NMap:", err)
-		return
-	}
-
-	// Регулярное выражение для извлечения процентов выполнения
-	percentRegex := regexp.MustCompile(`About (\d+(\.\d+)?)%`)
-
-	// Потоковая обработка вывода stdout
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if matches := percentRegex.FindStringSubmatch(line); matches != nil {
-				percent := matches[1] // Достаем процент выполнения
-				fmt.Printf("Прогресс: %s%% завершено\n", percent)
-
-				// Обновляем процент выполнения в базе данных
-				if err := database.DB.Model(&models.TaskStatus{}).Where("id = ?", taskID).Update("percent", percent).Error; err != nil {
-					log.Println("Ошибка обновления процента выполнения:", err)
-					logger.Println("Ошибка обновления процента выполнения:", err)
-				}
-			}
-		}
-	}()
-
-	// Потоковая обработка вывода stderr
-	go func() {
-		scanner := bufio.NewScanner(stderr)
-		for scanner.Scan() {
-			fmt.Println("[NMap STDERR]:", scanner.Text())
-		}
-	}()
-
-	// Ожидание завершения команды
-	if err := nmapCmd.Wait(); err != nil {
-		log.Println("Ошибка выполнения команды NMap:", err)
-		logger.Println("Ошибка выполнения команды NMap:", err)
-		database.DB.Model(&models.TaskStatus{}).Where("id = ?", taskID).Update("status", "error")
-		return
-	}
-
-	// Обновляем статус и процент выполнения на 100% после завершения
-	database.DB.Model(&models.TaskStatus{}).Where("id = ?", taskID).Updates(map[string]interface{}{
-		"percent": 100,
-		"status":  "completed",
-	})
-
-	fmt.Println("Результаты NMap сохранены в файл:", report)
-	fmt.Println("Скрипт:", script)
+type SQLMapParams struct {
+	TargetURL string `json:"target_url"`
+	Cookies   string `json:"cookies,omitempty"`
+	Level     int    `json:"level"`
+	Risk      int    `json:"risk"`
 }
 
+type DDosParams struct {
+	Target      string `json:"target"`
+	Port        int    `json:"port"`
+	PacketType  string `json:"packet_type"`
+	Speed       int    `json:"speed"`
+	PacketCount int    `json:"packet_count"`
+}
+
+// decodeParams декодирует JSON-параметры задачи
+func decodeParams(task models.TaskStatus, dest interface{}) error {
+	if err := json.Unmarshal([]byte(task.Params), dest); err != nil {
+		return fmt.Errorf("Ошибка декодирования Params: %v", err)
+	}
+	return nil
+}
+
+// ProcessNmapRequest обрабатывает запрос на создание задачи
 func ProcessNmapRequest(c *gin.Context) {
 	var input struct {
 		Name   string   `json:"name" binding:"required"`
-		Hosts  []string `json:"hosts" binding:"required"` // Список IP хостов
-		Script string   `json:"script" binding:"required"`
+		Hosts  []string `json:"hosts" binding:"required"`
+		Type   string   `json:"type" binding:"required"`
+		Params string   `json:"params" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -128,16 +69,20 @@ func ProcessNmapRequest(c *gin.Context) {
 		return
 	}
 
-	// Проверка существования всех хостов
+	// Проверяем существование хостов в базе данных
 	var existingHosts []models.Host
-	database.DB.Where("ip IN ?", input.Hosts).Find(&existingHosts)
+	if err := database.DB.Where("ip IN ?", input.Hosts).Find(&existingHosts).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch hosts", "details": err.Error()})
+		return
+	}
 
-	// Собираем список отсутствующих хостов
+	// Собираем список существующих IP
 	existingIPs := make(map[string]bool)
 	for _, host := range existingHosts {
 		existingIPs[host.IP] = true
 	}
 
+	// Определяем отсутствующие IP
 	var missingHosts []string
 	for _, ip := range input.Hosts {
 		if !existingIPs[ip] {
@@ -145,7 +90,7 @@ func ProcessNmapRequest(c *gin.Context) {
 		}
 	}
 
-	// Если есть отсутствующие хосты, возвращаем ошибку
+	// Если есть отсутствующие IP, возвращаем ошибку
 	if len(missingHosts) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":         "Some hosts do not exist",
@@ -154,28 +99,152 @@ func ProcessNmapRequest(c *gin.Context) {
 		return
 	}
 
-	// Создание задачи
+	// Создаём задачу с привязанными хостами
 	task := models.TaskStatus{
 		Name:   input.Name,
-		Status: "pending",
+		Type:   input.Type,
+		Status: StatusPending,
+		Params: input.Params,
 		Hosts:  existingHosts, // Привязываем только существующие хосты
-		Script: input.Script,
 	}
 
-	// Сохранение задачи в базе данных
+	// Сохраняем задачу в базе данных
 	if err := database.DB.Create(&task).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create task", "details": err.Error()})
 		return
 	}
-	go func() {
-		for ip := range existingIPs {
-			startNmap(ip, input.Script, task.ID)
-		}
-	}()
-	c.JSON(http.StatusOK, gin.H{"message": "Task created successfully", "task": task.ID})
 
+	BroadcastTask(task) // Уведомляем WebSocket клиентов
+
+	// Асинхронная обработка задачи
+	go func() {
+		if err := executeTask(task); err != nil {
+			log.Printf("Ошибка выполнения задачи: %v", err)
+			database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		}
+		//BroadcastTask(task) // Уведомляем о завершении
+	}()
+
+	c.JSON(http.StatusOK, gin.H{"message": "Task created successfully", "task_id": task.ID})
 }
 
+// executeTask выполняет задачу в зависимости от её типа
+func executeTask(task models.TaskStatus) error {
+	switch task.Type {
+	case "nmap":
+		var params NmapParams
+		if err := decodeParams(task, &params); err != nil {
+			database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+			return err
+		}
+		return executeNmap(task, params)
+	case "sqlmap":
+		var params SQLMapParams
+		if err := decodeParams(task, &params); err != nil {
+			database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+			return err
+		}
+		return RunSQL(task, params)
+	case "ddos":
+		var params DDosParams
+		if err := decodeParams(task, &params); err != nil {
+			database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+			return err
+		}
+		return ExecuteDDos(task, params)
+	default:
+		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		return fmt.Errorf("unsupported task type: %s", task.Type)
+	}
+}
+
+// executeNmap выполняет задачу Nmap
+func executeNmap(task models.TaskStatus, params NmapParams) error {
+	if params.Ports == "" {
+		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		return fmt.Errorf("missing required parameter 'ports'")
+	}
+
+	currentTime := time.Now()
+	currentDate := currentTime.Format("2006-01-02")
+	report := fmt.Sprintf("report/nmap/task%d-%s.xml", task.ID, currentDate)
+
+	ipList := []string{}
+	for _, host := range task.Hosts {
+		ipList = append(ipList, host.IP)
+	}
+	ip := strings.Join(ipList, " ")
+	if ip == "" {
+		return fmt.Errorf("no valid hosts specified")
+	}
+
+	command := fmt.Sprintf("nmap -sV --stats-every 5s -p %s %s -oX %s", params.Ports, ip, report)
+	if params.Script != "" {
+		command = fmt.Sprintf("nmap -sV --stats-every 5s -p %s --script=%s %s -oX %s", params.Ports, params.Script, ip, report)
+	}
+
+	cmd := exec.Command("powershell", "-Command", command)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		return fmt.Errorf("failed to get stdout pipe: %v", err)
+
+	}
+	defer stdout.Close()
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		return fmt.Errorf("failed to get stderr pipe: %v", err)
+	}
+	defer stderr.Close()
+
+	if err := cmd.Start(); err != nil {
+		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		return fmt.Errorf("failed to start Nmap command: %v", err)
+	}
+
+	progressRegex := regexp.MustCompile(`About (\d+(\.\d+)?)% done`)
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			line := scanner.Text()
+			log.Printf("[Nmap]: %s", line)
+
+			if matches := progressRegex.FindStringSubmatch(line); matches != nil {
+				percent := matches[1]
+				percentValue, _ := strconv.ParseFloat(percent, 32)
+				task.Percent = float32(percentValue)
+				database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("percent", percentValue)
+				BroadcastTask(task)
+			}
+		}
+	}()
+
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			log.Printf("[Nmap STDERR]: %s", scanner.Text())
+		}
+	}()
+
+	if err := cmd.Wait(); err != nil {
+		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+		return fmt.Errorf("nmap execution failed: %v", err)
+	}
+
+	database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Updates(map[string]interface{}{
+		"status":  StatusCompleted,
+		"percent": 100,
+	})
+	task.Status = StatusCompleted
+	task.Percent = 100
+	BroadcastTask(task)
+
+	return nil
+}
+
+// Не знаю зачем нам кастомные скрипты, мы их нормально обрабатывать не сможем
 func UploadScript(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -244,7 +313,7 @@ func GetLastNmap(c *gin.Context) {
 
 func GetAllNmap(c *gin.Context) {
 	// Путь к папке с файлами
-	dir := "reports"
+	dir := "reports/nmap"
 
 	files, err := os.ReadDir(dir)
 	if err != nil {

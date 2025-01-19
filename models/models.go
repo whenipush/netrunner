@@ -20,12 +20,13 @@ type Host struct {
 
 type TaskStatus struct {
 	gorm.Model
-	NumberTask string  `gorm:"type:varchar(255);unique_index" json:"number_task"` // Автоматическая генерация
+	NumberTask string  `gorm:"type:varchar(255);unique_index" json:"number_task"`
 	Name       string  `gorm:"type:varchar(255);unique_index" json:"name"`
+	Type       string  `gorm:"type:varchar(50)" json:"type"` // Тип задачи
 	Status     string  `gorm:"default:pending" json:"status"`
 	Percent    float32 `gorm:"default:0" json:"percent"`
-	Hosts      []Host  `gorm:"many2many:task_hosts" json:"hosts"`
-	Script     string  `json:"script"`
+	Hosts      []Host  `gorm:"many2many:task_hosts" json:"hosts"` // Список хостов
+	Params     string  `gorm:"type:text" json:"params"`           // JSON в виде строки
 }
 
 func (task *TaskStatus) BeforeCreate(tx *gorm.DB) (err error) {
