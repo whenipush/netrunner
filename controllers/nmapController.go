@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"netrunner/database"
@@ -17,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // / Константы для статусов задач
@@ -49,7 +50,11 @@ type DDosParams struct {
 
 // decodeParams декодирует JSON-параметры задачи
 func decodeParams(task models.TaskStatus, dest interface{}) error {
-	if err := json.Unmarshal([]byte(task.Params), dest); err != nil {
+	params, err := json.Marshal(task.Params)
+	if err != nil {
+		return fmt.Errorf("Ошибка декодирования Params: %v", err)
+	}
+	if err := json.Unmarshal([]byte(params), dest); err != nil {
 		return fmt.Errorf("Ошибка декодирования Params: %v", err)
 	}
 	return nil
@@ -58,16 +63,17 @@ func decodeParams(task models.TaskStatus, dest interface{}) error {
 // ProcessNmapRequest обрабатывает запрос на создание задачи
 func ProcessNmapRequest(c *gin.Context) {
 	var input struct {
-		Name   string   `json:"name" binding:"required"`
-		Hosts  []string `json:"hosts" binding:"required"`
-		Type   string   `json:"type" binding:"required"`
-		Params string   `json:"params" binding:"required"`
+		Name   string      `json:"name" binding:"required"`
+		Hosts  []string    `json:"hosts" binding:"required"`
+		Type   string      `json:"type" binding:"required"`
+		Params models.Json `json:"params" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Println(input)
 
 	// Проверяем существование хостов в базе данных
 	var existingHosts []models.Host
@@ -354,7 +360,6 @@ func GetTaskStatus(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
 	}
-
 	// Если задача найдена, возвращаем её в JSON
 	c.JSON(http.StatusOK, task)
 }

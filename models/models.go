@@ -1,9 +1,30 @@
 package models
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"fmt"
+
 	"gorm.io/gorm"
 )
+
+type Json map[string]interface{}
+
+func (j *Json) Scan(value interface{}) error {
+	if value == nil {
+		*j = make(Json)
+		return nil
+	}
+	bytes, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("Cant convert to []byte")
+	}
+	return json.Unmarshal(bytes, j)
+}
+
+func (j Json) Value() (driver.Value, error) {
+	return json.Marshal(j)
+}
 
 type Group struct {
 	gorm.Model
@@ -26,7 +47,7 @@ type TaskStatus struct {
 	Status     string  `gorm:"default:pending" json:"status"`
 	Percent    float32 `gorm:"default:0" json:"percent"`
 	Hosts      []Host  `gorm:"many2many:task_hosts" json:"hosts"` // Список хостов
-	Params     string  `gorm:"type:text" json:"params"`           // JSON в виде строки
+	Params     Json    `gorm:"type:json" json:"params"`           // JSON в виде строки
 }
 
 func (task *TaskStatus) BeforeCreate(tx *gorm.DB) (err error) {

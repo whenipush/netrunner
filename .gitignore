@@ -46,3 +46,7 @@ database.db
 
 # Go workspace file
 go.work
+
+
+report/
+scripts/
