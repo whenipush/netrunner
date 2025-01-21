@@ -18,7 +18,6 @@ func CreateHost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	if net.ParseIP(host.IP) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid IP address"})
 		return
@@ -41,7 +40,7 @@ func CreateHost(c *gin.Context) {
 
 func GetAllHost(c *gin.Context) {
 	var hosts []models.Host
-	if err := database.DB.Find(&hosts).Error; err != nil {
+	if err := database.DB.Preload("Groups").Find(&hosts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

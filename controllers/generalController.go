@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"netrunner/database"
 	"netrunner/handlers"
 	"netrunner/models"
 	"sync"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 func UploadDatabaseBDU(c *gin.Context) {
@@ -68,13 +70,21 @@ func HandleWebSocket(c *gin.Context) {
 	if err != nil {
 		log.Printf("Ошибка обновления до WebSocket: %v", err)
 		return
+	} else {
+		log.Printf("Успешное подключение к websocket: %v", conn.RemoteAddr())
 	}
 	defer conn.Close()
 
 	mu.Lock()
 	clients[conn] = true
 	mu.Unlock()
+	var task []models.TaskStatus
 
+	if err := database.DB.Preload("Hosts").Find(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	conn.WriteJSON(task)
 	// Ожидание сообщений
 	for {
 		_, _, err := conn.ReadMessage()
