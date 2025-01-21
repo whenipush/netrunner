@@ -21,23 +21,53 @@ func main() {
 
 	r.Use(cors.Default())
 
-	// Host endpoints
-	r.GET("/api/v1/host", controllers.GetAllHost)          // Получить все хосты
-	r.GET("/api/v1/host-by-name", controllers.GetHostByID) // Хост по имени
-	r.POST("/api/v1/host", controllers.CreateHost)         // Создать новый хост
-	r.PUT("/api/v1/host/:id", controllers.UpdateHost)      // Изменить хост по ID
-	r.DELETE("/api/v1/host/:id", controllers.DeleteHost)   // Удалить хост по ID
+	// Группа для работы с хостами (Hosts)
+	hostRoutes := r.Group("/api/v1/host")
+	{
+		// Создание хоста
+		// POST /host
+		hostRoutes.POST("/", controllers.CreateHost)
 
+		// Получение всех хостов
+		// GET /host
+		hostRoutes.GET("/", controllers.GetAllHost)
+
+		// Получение хоста по IP (query-параметр ip=...)
+		// GET /host/search?ip=1.2.3.4
+		hostRoutes.GET("/search", controllers.GetHostByID)
+
+		// Обновление хоста по ID
+		// PUT /host/:id
+		hostRoutes.PUT("/:id", controllers.UpdateHost)
+
+		// Удаление хоста по ID
+		// DELETE /host/:id
+		hostRoutes.DELETE("/:id", controllers.DeleteHost)
+	}
+
+	// Эндпоинт для добавления хостов в группы
+	// POST /add-hosts-to-groups
+	r.POST("/add-hosts-to-groups", controllers.AddHostToGroupHandler)
 	// Group endpoints
 
-	r.GET("/api/v1/group", controllers.GetAllGroup)             // Получить все группы
-	r.POST("/api/v1/group", controllers.CreateGroup)            // Создать новую группу
-	r.PUT("/api/v1/group/:id", controllers.UpdateGroup)         // Изменить группу по ID
-	r.DELETE("/api/v1/group/:id", controllers.DeleteGroup)      // Удалить группу по ID
-	r.GET("/api/v1/group-by-name/", controllers.GetGroupByName) // Удалить группу по name
+	groupRoutes := r.Group("/api/v1/group")
+	{
+		// Создание группы
+		groupRoutes.POST("/", controllers.CreateGroup)
 
-	// Host-Group endpoints
-	r.POST("/api/v1/host-add-group", controllers.AddHostToGroupHandler) // Добавить хосты к группам
+		// Получение всех групп
+		groupRoutes.GET("/", controllers.GetAllGroup)
+
+		// Получение группы по имени (через query-параметр "group=...")
+		// Пример: GET /group/search?group=GroupName
+		groupRoutes.GET("/search", controllers.GetGroupByName)
+
+		// Обновление группы по ID (прокидываем id как /group/:id)
+		groupRoutes.PUT("/:id", controllers.UpdateGroup)
+
+		// Удаление группы по ID (прокидываем id как /group/:id)
+		groupRoutes.DELETE("/:id", controllers.DeleteGroup)
+	}
 
 	// other endpoints nmap
 

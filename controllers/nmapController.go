@@ -48,6 +48,11 @@ type DDosParams struct {
 	PacketCount int    `json:"packet_count"`
 }
 
+type PentestParams struct {
+	Ports string `json:"ports"`
+	Speed string `json:"speed"`
+}
+
 // decodeParams декодирует JSON-параметры задачи
 func decodeParams(task models.TaskStatus, dest interface{}) error {
 	params, err := json.Marshal(task.Params)
@@ -158,6 +163,15 @@ func executeTask(task models.TaskStatus) error {
 			return err
 		}
 		return ExecuteDDos(task, params)
+	case "pentest":
+		var params PentestParams
+		if err := decodeParams(task, &params); err != nil {
+			database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+			return err
+		}
+		log.Printf("Выполняется задача Pentest с параметрами: %+v", params)
+		return ExecutePentest(task, params)
+
 	default:
 		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
 		return fmt.Errorf("unsupported task type: %s", task.Type)

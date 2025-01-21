@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
-	"netrunner/handlers"
 	"netrunner/models"
 	"sync"
 )
@@ -39,12 +38,12 @@ func UploadDatabaseBDU(c *gin.Context) {
 	}
 
 	// Передача файлов в обработчик
-	if _, err := handlers.UpdateDatabaseBDU(savedFiles["vullist.xlsx"], savedFiles["export.xml"]); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("Failed to process uploaded files: %v", err),
-		})
-		return
-	}
+	//if _, err := handlers.UpdateDatabaseBDU(savedFiles["vullist.xlsx"], savedFiles["export.xml"]); err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{
+	//		"error": fmt.Sprintf("Failed to process uploaded files: %v", err),
+	//	})
+	//	return
+	//}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded and processed successfully"})
 }

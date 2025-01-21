@@ -35,13 +35,13 @@ func GetAllGroup(c *gin.Context) {
 
 func GetGroupByName(c *gin.Context) {
 	name := c.Query("group")
-	var host models.Group
+	var group models.Group
 
-	if err := database.DB.Preload("Hosts").Where("name = ?", name).First(&name).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Host not found"})
+	if err := database.DB.Preload("Hosts").Where("name = ?", name).First(&group).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Group not found"})
 		return
 	}
-	c.JSON(http.StatusOK, host)
+	c.JSON(http.StatusOK, group)
 }
 
 func UpdateGroup(c *gin.Context) {
