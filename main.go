@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"netrunner/controllers"
 	"netrunner/database"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 // kek
@@ -71,6 +72,7 @@ func main() {
 
 	// other endpoints nmap
 
+	r.GET("/api/v1/pentest/:number_task", controllers.GetPentestJsonByNumberTask)
 	r.POST("/api/v1/upload-script", controllers.UploadScript) // Загрузить скрипт nmap на сервер
 	r.POST("/api/v1/nmap", controllers.ProcessNmapRequest)
 	r.GET("/api/v1/task-status/:number_task", controllers.GetTaskStatus)
