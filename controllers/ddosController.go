@@ -8,6 +8,8 @@ import (
 	"os/exec"
 )
 
+// TODO: Доделать DDoS
+
 // executeDDos выполняет задачу DDoS
 func ExecuteDDos(task models.TaskStatus, params DDosParams) error {
 	if params.Target == "" {

@@ -6,49 +6,12 @@ import (
 	"net/http"
 	"netrunner/database"
 	"netrunner/models"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
-
-func UploadDatabaseBDU(c *gin.Context) {
-	// Ожидаемые файлы
-	files := []string{"export.xml", "vullist.xlsx"}
-	savedFiles := make(map[string]string) // Для хранения путей к загруженным файлам
-
-	// Загрузка файлов
-	for _, expectedFile := range files {
-		file, err := c.FormFile(expectedFile)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintf("Missing required file: %s", expectedFile),
-			})
-			return
-		}
-
-		// Формируем путь для сохранения файла
-		filepath := "./vulners/" + expectedFile
-		if err := c.SaveUploadedFile(file, filepath); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": fmt.Sprintf("Failed to save file '%s': %v", expectedFile, err),
-			})
-			return
-		}
-
-		savedFiles[expectedFile] = filepath // Сохраняем путь к файлу
-	}
-
-	// Передача файлов в обработчик
-	//if _, err := handlers.UpdateDatabaseBDU(savedFiles["vullist.xlsx"], savedFiles["export.xml"]); err != nil {
-	//	c.JSON(http.StatusInternalServerError, gin.H{
-	//		"error": fmt.Sprintf("Failed to process uploaded files: %v", err),
-	//	})
-	//	return
-	//}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded and processed successfully"})
-}
 
 // WebSocket управление
 var (
@@ -109,4 +72,32 @@ func BroadcastTask(task models.TaskStatus) {
 			delete(clients, client)
 		}
 	}
+}
+
+// Не знаю зачем нам кастомные скрипты, мы их нормально обрабатывать не сможем
+func UploadScript(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(500, fmt.Sprintf("get form file err: %v", err))
+		return
+	}
+
+	if file.Filename == "" {
+		c.JSON(400, "File name is required")
+		return
+	}
+	filesplit := strings.Split(file.Filename, ".")
+	fileExt := filesplit[len(filesplit)-1]
+
+	if fileExt != "lua" {
+		c.JSON(400, gin.H{"Error": "Only lua files are allowed"})
+		return
+	}
+
+	filepath := "./scripts/" + file.Filename
+	if err := c.SaveUploadedFile(file, filepath); err != nil {
+		c.JSON(500, fmt.Sprintf("upload file err: %v", err))
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully", "filename": file.Filename})
 }

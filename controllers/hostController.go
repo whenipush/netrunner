@@ -97,7 +97,7 @@ func DeleteHost(c *gin.Context) {
 
 // AddHostToGroupHandler - добавляет хосты к группам.
 
-func AddHostToGroupHandler(c *gin.Context) {
+func AddHostToGroup(c *gin.Context) {
 
 	var input struct {
 		HostIDs  []uint `json:"host_ids" binding:"required"`  // Массив ID хостов
