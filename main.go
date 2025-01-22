@@ -3,6 +3,7 @@ package main
 import (
 	"netrunner/controllers"
 	"netrunner/database"
+	"netrunner/parser"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,8 @@ func main() {
 	//}))
 
 	r.Use(cors.Default())
-
+	// parseCVE("parser/cve/cve.json")
+	parser.ParseCVE("parser/cve/cve.json")
 	// Группа для работы с хостами (Hosts)
 	hostRoutes := r.Group("/api/v1/host")
 	{
@@ -38,6 +40,8 @@ func main() {
 
 		// DELETE /api/v1/host/:id - Удалить хост по ID
 		hostRoutes.DELETE("/:id", controllers.DeleteHost)
+
+		hostRoutes.PATCH("/name", controllers.ChangeHostName)
 	}
 
 	// Эндпоинты для работы с группами (Groups)
@@ -68,13 +72,13 @@ func main() {
 	r.POST("/api/v1/task", controllers.CreateTask)
 
 	// GET /api/v1/task-status/:number_task - Проверить статус задачи
-	r.GET("/api/v1/task-status/:number_task", controllers.GetTaskStatus)
+	r.GET("/api/v1/task/:number_task", controllers.GetTaskStatus)
 
 	// DELETE /api/v1/task/:number_task - Удалить задачу
 	r.DELETE("/api/v1/task/:number_task", controllers.DeleteTask)
 
 	// GET /api/v1/task-all - Получить все задачи
-	r.GET("/api/v1/task-all", controllers.GetTaskAll)
+	r.GET("/api/v1/task", controllers.GetTaskAll)
 
 	// Остальные эндпоинты
 

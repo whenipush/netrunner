@@ -50,3 +50,4 @@ go.work
 
 report/
 scripts/
+parser/cve

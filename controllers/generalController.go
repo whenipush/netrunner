@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"netrunner/database"
 	"netrunner/models"
 	"strings"
 	"sync"
@@ -40,13 +39,13 @@ func HandleWebSocket(c *gin.Context) {
 	mu.Lock()
 	clients[conn] = true
 	mu.Unlock()
-	var task []models.TaskStatus
+	/*var task []models.TaskStatus
 
 	if err := database.DB.Preload("Hosts").Find(&task).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	conn.WriteJSON(task)
+	conn.WriteJSON(task)*/
 	// Ожидание сообщений
 	for {
 		_, _, err := conn.ReadMessage()
