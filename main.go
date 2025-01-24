@@ -23,29 +23,18 @@ func main() {
 
 	r.Use(cors.Default())
 	// parseCVE("parser/cve/cve.json")
-	parser.ParseCVE("parser/cve/cve.json")
+	/*parser.ParseCVE("parser/cve/cve.json")
 	log.Printf("%v", parser.Database.FindCve(parser.CPE{
 		CPEVersion: "2.3",
 		Vendor:     "apache",
 		Product:    "http_server",
 		Version:    "2.4.48",
-	}))
-	/*for k, v := range parser.VulnDatabase {
-		for _, cpe := range v.Cpe23 {
-			if strings.Contains(cpe, "apache:http_server:*") {
-				log.Printf("%s", k)
-				log.Printf("%v", v)
-				break
-			}
-		}
-		for _, cpe := range v.Cpe {
-			if strings.Contains(cpe, "apache:http_server") {
-				log.Printf("%s", k)
-				break
-			}
-		}
-	}*/
-
+	}))*/
+	if err := parser.ParseBDU("parser/bdu/export.xml"); err != nil {
+		log.Printf("%s", err)
+	} else {
+		log.Printf("%v", parser.BDUDatabase)
+	}
 	// Группа для работы с хостами (Hosts)
 	hostRoutes := r.Group("/api/v1/host")
 	{
