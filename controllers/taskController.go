@@ -88,11 +88,10 @@ type SQLMapParams struct {
 }
 
 type DDosParams struct {
-	Target      string `json:"target"`
-	Port        int    `json:"port"`
+	Ports       string `json:"port"`
 	PacketType  string `json:"packet_type"`
-	Speed       int    `json:"speed"`
-	PacketCount int    `json:"packet_count"`
+	Speed       string `json:"speed"`
+	PacketCount string `json:"packet_count"`
 }
 
 type PentestParams struct {

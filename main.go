@@ -74,7 +74,7 @@ func main() {
 	r.DELETE("/api/v1/task/:number_task", controllers.DeleteTask)
 
 	// GET /api/v1/task-all - Получить все задачи
-	r.GET("/api/v1/task-all", controllers.GetTaskAll)
+	r.GET("/api/v1/task", controllers.GetTaskAll)
 
 	// Остальные эндпоинты
 
