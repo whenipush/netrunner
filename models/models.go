@@ -34,6 +34,7 @@ type Group struct {
 
 type Host struct {
 	gorm.Model
+	Name     string       `gorm:"type:varchar(255);unique_index" json:"name"`
 	IP       string       `gorm:"type:varchar(255);unique_index" json:"ip"`
 	Groups   []Group      `gorm:"many2many:group_hosts"`
 	TaskList []TaskStatus `gorm:"many2many:task_hosts" json:"task_list"`
