@@ -46,7 +46,7 @@ func HandleWebSocket(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	conn.WriteJSON(task)
+	//conn.WriteJSON(task)
 	// Ожидание сообщений
 	for {
 		_, _, err := conn.ReadMessage()

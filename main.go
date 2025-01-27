@@ -74,7 +74,7 @@ func main() {
 	r.DELETE("/api/v1/task/:number_task", controllers.DeleteTask)
 
 	// GET /api/v1/task-all - Получить все задачи
-	r.GET("/api/v1/task-all", controllers.GetTaskAll)
+	r.GET("/api/v1/task", controllers.GetTaskAll)
 
 	// Остальные эндпоинты
 
@@ -87,8 +87,8 @@ func main() {
 	// WebSocket подключение
 	// GET /api/v1/ws - Подключение WebSocket
 	r.GET("/api/v1/ws", controllers.HandleWebSocket)
-
+	r.GET("/api/v1/client", controllers.HandleClientSocketConnection)
 	// Запуск сервера на порту 3001
-	r.Run(":3001")
-
+	//r.Run(":3001")
+	r.RunTLS(":3002", "certs/ServerCert.crt", "certs/ServerCertKey.pem")
 }
