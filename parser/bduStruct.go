@@ -1,6 +1,10 @@
 package parser
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+
+	"github.com/lithammer/fuzzysearch/fuzzy"
+)
 
 type VulnSoftware struct {
 	Soft []Soft `xml:"soft"`
@@ -82,4 +86,26 @@ type Vul struct {
 type Vulnerabilities struct {
 	XMLName xml.Name `xml:"vulnerabilities"`
 	Vulns   []Vul    `xml:"vul"`
+}
+
+type Package struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+}
+
+func (v Vulnerabilities) FindVulns(pack Package) []Vul {
+	vulns := make([]Vul, 0)
+	for _, vuln := range v.Vulns {
+		for _, soft := range vuln.VulnerableSoftware.Soft {
+			nameFuzzy := fuzzy.RankMatch(soft.Name, pack.Name)
+			versionFuzzy := fuzzy.RankMatch(soft.Version, pack.Version)
+			if (nameFuzzy > -1 && nameFuzzy < 10) && (versionFuzzy > -1 && versionFuzzy > 10) {
+				vulns = append(vulns, vuln)
+			}
+			/*if strings.Contains(soft.Name, pack.Name) && strings.Contains(soft.Version, pack.Version) {
+				vulns = append(vulns, vuln)
+			}*/
+		}
+	}
+	return vulns
 }

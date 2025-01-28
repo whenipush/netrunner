@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
+	"netrunner/parser"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -40,8 +42,19 @@ func HandleClientSocketConnection(c *gin.Context) {
 		delete(clientsConnection, adrr.String())
 	}()
 	for {
+		var packages []parser.Package
 		_, message, err := conn.ReadMessage()
-		log.Printf("Client message: %s", message)
+		if json.Unmarshal(message, &packages) != nil {
+			log.Printf("Failed to parse client packages")
+			continue
+		}
+		for _, p := range packages {
+			vulns := parser.BDUDatabase.FindVulns(p)
+			if len(vulns) > 0 {
+				log.Printf("%v :\n%v", p, vulns)
+			}
+		}
+		log.Printf("Client message recived")
 		if err != nil {
 			delete(clientsConnection, adrr.String())
 			break

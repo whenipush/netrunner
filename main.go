@@ -33,7 +33,7 @@ func main() {
 	if err := parser.ParseBDU("parser/bdu/export.xml"); err != nil {
 		log.Printf("%s", err)
 	} else {
-		log.Printf("%v", parser.BDUDatabase)
+		log.Printf("Succesfully parsed BDU")
 	}
 	// Группа для работы с хостами (Hosts)
 	hostRoutes := r.Group("/api/v1/host")
