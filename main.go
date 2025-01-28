@@ -88,6 +88,8 @@ func main() {
 	// GET /api/v1/ws - Подключение WebSocket
 	r.GET("/api/v1/ws", controllers.HandleWebSocket)
 
+	r.POST("/api/v1/ping", controllers.PingHosts)
+
 	// Запуск сервера на порту 3001
 	r.Run(":3001")
 
