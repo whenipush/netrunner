@@ -1,28 +1,28 @@
 package controllers
 
 import (
+	"fmt"
+	"net"
+	"time"
+
 	"github.com/gin-gonic/gin"
-	"netrunner/handlers"
+	"github.com/tatsushid/go-fastping"
 )
 
+var Pinger = fastping.NewPinger()
+
 func PingHosts(c *gin.Context) {
-	// Структура данных для запроса
-	var request struct {
-		IPRange string `json:"ip"` // Поле для диапазона IP
+	activeHosts := make([]string, 0)
+
+	Pinger.OnRecv = func(i *net.IPAddr, d time.Duration) {
+		activeHosts = append(activeHosts, i.String())
 	}
 
-	if request.IPRange == "" {
-		c.JSON(200, gin.H{"error": "Not found IPs"})
-	}
-
-	// Прочитаем тело запроса и заполним структуру
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request"})
+	if err := Pinger.Run(); err != nil {
+		c.JSON(400, gin.H{"error": fmt.Sprintf("Failed to ping hosts: %s", err.Error())})
 		return
 	}
-
 	// Сканируем сеть по указанному диапазону
-	activeHosts := handlers.ScanNetwork(request.IPRange)
 
 	// Отправляем список активных хостов в ответ
 	c.JSON(200, gin.H{

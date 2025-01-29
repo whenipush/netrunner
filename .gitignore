@@ -50,3 +50,6 @@ go.work
 
 report/
 scripts/
+certs/
+parser/bdu
+parser/cve

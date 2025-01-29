@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"netrunner/controllers"
 	"netrunner/database"
 
@@ -18,6 +19,11 @@ func main() {
 	//	AllowHeaders:     []string{"Content-Type", "Authorization"},         // Разрешенные заголовки
 	//	AllowCredentials: true,                                              // Разрешите использование куки/сессий
 	//}))
+	for i := 0; i < 255; i++ {
+		for j := 0; j < 255; j++ {
+			controllers.Pinger.AddIP(fmt.Sprintf("192.168.%d.%d", i, j))
+		}
+	}
 
 	r.Use(cors.Default())
 
@@ -88,7 +94,7 @@ func main() {
 	// GET /api/v1/ws - Подключение WebSocket
 	r.GET("/api/v1/ws", controllers.HandleWebSocket)
 
-	r.POST("/api/v1/ping", controllers.PingHosts)
+	r.GET("/api/v1/ping", controllers.PingHosts)
 
 	// Запуск сервера на порту 3001
 	r.Run(":3001")

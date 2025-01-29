@@ -29,28 +29,30 @@ func ScanNetwork(ipRange string) []string {
 
 	// Преобразуем ipRange в список адресов
 	ipParts := strings.Split(ipRange, ".")
-	baseIP := fmt.Sprintf("%s.%s.%s.", ipParts[0], ipParts[1], ipParts[2])
+	baseIP := fmt.Sprintf("%s.%s.", ipParts[0], ipParts[1])
 
 	// Сканируем все IP в пределах локальной сети
-	for i := 1; i <= 254; i++ {
-		ip := fmt.Sprintf("%s%d", baseIP, i)
-		wg.Add(1)
+	for j := 0; j < 255; j++ {
+		for i := 1; i <= 255; i++ {
+			ip := fmt.Sprintf("%s.%d.%d", baseIP, j, i)
+			wg.Add(1)
 
-		go func(ip string) {
-			defer wg.Done()
+			go func(ip string) {
+				defer wg.Done()
 
-			if pingHost(ip) {
-				mu.Lock()
-				activeHosts = append(activeHosts, ip)
-				mu.Unlock()
-				fmt.Printf("Host found: %s\n", ip)
+				if pingHost(ip) {
+					mu.Lock()
+					activeHosts = append(activeHosts, ip)
+					mu.Unlock()
+					fmt.Printf("Host found: %s\n", ip)
+				}
+			}(ip)
+
+			// Добавляем небольшую задержку, чтобы избежать перегрузки
+			// Например, 10 горутин одновременно
+			if i%10 == 0 {
+				time.Sleep(200 * time.Millisecond)
 			}
-		}(ip)
-
-		// Добавляем небольшую задержку, чтобы избежать перегрузки
-		// Например, 10 горутин одновременно
-		if i%10 == 0 {
-			time.Sleep(200 * time.Millisecond)
 		}
 	}
 
