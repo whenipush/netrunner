@@ -18,6 +18,7 @@ func CreateHost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	if net.ParseIP(host.IP) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid IP address"})
 		return
@@ -67,7 +68,7 @@ func UpdateHost(c *gin.Context) {
 		return
 	}
 
-	id := c.Params.ByName("id")
+	id := c.Params.ByName("ip")
 	if err := database.DB.Where("id = ?", id).First(&host).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Host not found"})
 		return
@@ -95,7 +96,7 @@ func DeleteHost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"id #" + id: "deleted"})
 }
 
-// AddHostToGroupHandler - добавляет хосты к группам.
+// AddHostToGroup - добавляет хосты к группам.
 
 func AddHostToGroup(c *gin.Context) {
 
@@ -129,4 +130,17 @@ func AddHostToGroup(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "Hosts added to groups successfully"})
+}
+
+func ChangeHostName(c *gin.Context) {
+	var input struct {
+		Ip   string `json:"ip" binding:"required"`
+		Name string `json:"name" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()}) // Ошибка валидации
+		return
+	}
+	database.DB.Model(&models.Host{}).Where("ip = ?", input.Ip).Update("name", input.Name)
+	c.JSON(200, gin.H{})
 }

@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"netrunner/controllers"
 	"netrunner/database"
+	"netrunner/parser"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -26,7 +28,19 @@ func main() {
 	}
 
 	r.Use(cors.Default())
-
+	// parseCVE("parser/cve/cve.json")
+	/*parser.ParseCVE("parser/cve/cve.json")
+	log.Printf("%v", parser.Database.FindCve(parser.CPE{
+		CPEVersion: "2.3",
+		Vendor:     "apache",
+		Product:    "http_server",
+		Version:    "2.4.48",
+	}))*/
+	if err := parser.ParseBDU("parser/bdu/export.xml"); err != nil {
+		log.Printf("%s", err)
+	} else {
+		log.Printf("Succesfully parsed BDU")
+	}
 	// Группа для работы с хостами (Hosts)
 	hostRoutes := r.Group("/api/v1/host")
 	{
@@ -44,6 +58,8 @@ func main() {
 
 		// DELETE /api/v1/host/:id - Удалить хост по ID
 		hostRoutes.DELETE("/:id", controllers.DeleteHost)
+
+		hostRoutes.PATCH("/name", controllers.ChangeHostName)
 	}
 
 	// Эндпоинты для работы с группами (Groups)
@@ -74,7 +90,7 @@ func main() {
 	r.POST("/api/v1/task", controllers.CreateTask)
 
 	// GET /api/v1/task-status/:number_task - Проверить статус задачи
-	r.GET("/api/v1/task-status/:number_task", controllers.GetTaskStatus)
+	r.GET("/api/v1/task/:number_task", controllers.GetTaskStatus)
 
 	// DELETE /api/v1/task/:number_task - Удалить задачу
 	r.DELETE("/api/v1/task/:number_task", controllers.DeleteTask)
@@ -96,7 +112,8 @@ func main() {
 
 	r.GET("/api/v1/ping", controllers.PingHosts)
 
+	r.GET("/api/v1/client", controllers.HandleClientSocketConnection)
 	// Запуск сервера на порту 3001
-	r.Run(":3001")
-
+	//r.Run(":3001")
+	r.RunTLS(":3002", "certs/ServerCert.crt", "certs/ServerCertKey.pem")
 }
