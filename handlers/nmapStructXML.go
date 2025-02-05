@@ -194,22 +194,22 @@ type Owner struct {
 // Service contains detailed information about a Port's
 // service details.
 type Service struct {
-	Name       string `xml:"name,attr" json:"name"`
-	Conf       int    `xml:"conf,attr" json:"conf"`
-	Method     string `xml:"method,attr" json:"method"`
-	Version    string `xml:"version,attr" json:"version"`
-	Product    string `xml:"product,attr" json:"product"`
-	ExtraInfo  string `xml:"extrainfo,attr" json:"extrainfo"`
-	Tunnel     string `xml:"tunnel,attr" json:"tunnel"`
-	Proto      string `xml:"proto,attr" json:"proto"`
-	Rpcnum     string `xml:"rpcnum,attr" json:"rpcnum"`
-	Lowver     string `xml:"lowver,attr" json:"lowver"`
-	Highver    string `xml:"hiver,attr" json:"hiver"`
-	Hostname   string `xml:"hostname,attr" json:"hostname"`
-	OsType     string `xml:"ostype,attr" json:"ostype"`
-	DeviceType string `xml:"devicetype,attr" json:"devicetype"`
-	ServiceFp  string `xml:"servicefp,attr" json:"servicefp"`
-	CPEs       []CPE  `xml:"cpe" json:"cpes"`
+	Name       string   `xml:"name,attr" json:"name"`
+	Conf       int      `xml:"conf,attr" json:"conf"`
+	Method     string   `xml:"method,attr" json:"method"`
+	Version    string   `xml:"version,attr" json:"version"`
+	Product    string   `xml:"product,attr" json:"product"`
+	ExtraInfo  string   `xml:"extrainfo,attr" json:"extrainfo"`
+	Tunnel     string   `xml:"tunnel,attr" json:"tunnel"`
+	Proto      string   `xml:"proto,attr" json:"proto"`
+	Rpcnum     string   `xml:"rpcnum,attr" json:"rpcnum"`
+	Lowver     string   `xml:"lowver,attr" json:"lowver"`
+	Highver    string   `xml:"hiver,attr" json:"hiver"`
+	Hostname   string   `xml:"hostname,attr" json:"hostname"`
+	OsType     string   `xml:"ostype,attr" json:"ostype"`
+	DeviceType string   `xml:"devicetype,attr" json:"devicetype"`
+	ServiceFp  string   `xml:"servicefp,attr" json:"servicefp"`
+	CPEs       []string `xml:"cpe" json:"cpes"`
 }
 
 // CPE (Common Platform Enumeration) is a standardized way to name software

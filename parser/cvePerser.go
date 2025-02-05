@@ -111,7 +111,9 @@ func NewCpe(str string) (*CPE, error) {
 			CPEVersion: "2.2",
 			Vendor:     tokens[2],
 			Product:    tokens[3],
-			Version:    tokens[4],
+		}
+		if len(tokens) == 5 {
+			c.Version = tokens[4]
 		}
 		return c, nil
 	}
@@ -193,15 +195,20 @@ func ParseCVE(filepath string) {
 
 func (v Vulnerability) MatchCPE(cpe CPE) bool {
 	if cpe.Version == "*" || cpe.Version == "" {
-		log.Printf("[cpeParser] Tried to match cpe without version")
+		//log.Printf("[cpeParser] Tried to match cpe without version")
 		return false
 	}
 	cpeVersion, _ := version.NewVersion(cpe.Version)
 	found := false
 	for _, c := range v.Cpe {
 		match := c.MatchProduct(cpe)
-		if match && (c.Version != "*" || c.Version != "") {
-			return true
+		if match && (c.Version != "*" && c.Version != "") {
+			cVersion, err := version.NewVersion(c.Version)
+			if err != nil {
+				log.Printf("Error parsing version: %v %v", err, c.Version)
+				log.Printf("%v", c)
+			}
+			return cVersion.GreaterThanOrEqual(cpeVersion)
 		}
 		found = match || found
 	}
@@ -212,14 +219,26 @@ func (v Vulnerability) MatchCPE(cpe CPE) bool {
 		if !cpes.Criteria.MatchProduct(cpe) {
 			continue
 		}
+		if cpes.VersionEnd == "" {
+			if cpes.Criteria.Version == "*" {
+				log.Printf("%v", v)
+				return true
+			}
+			cVersion, err := version.NewVersion(cpes.Criteria.Version)
+			if err != nil {
+				log.Printf("Error parsing version: %v %v", err, cpes.Criteria.Version)
+				log.Printf("%v", cpes.Criteria)
+				return false
+			}
+			return cVersion.GreaterThanOrEqual(cpeVersion)
+		}
 		cpesVersion, err := version.NewVersion(cpes.VersionEnd)
 		if err != nil {
-			log.Printf("Error parsing version: %v", err)
-			log.Printf("%v", v)
+			log.Printf("Error parsing version: %v %v", err, cpes.VersionEnd)
+			log.Printf("%v", cpes)
 		}
-		if cpesVersion.GreaterThanOrEqual(cpeVersion) {
-			return true
-		}
+		log.Printf("%v, %v: %v", cpesVersion, cpeVersion, cpesVersion.GreaterThanOrEqual(cpeVersion))
+		return cpesVersion.GreaterThanOrEqual(cpeVersion)
 	}
 	return false
 }

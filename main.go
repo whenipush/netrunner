@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"netrunner/controllers"
 	"netrunner/database"
 	"netrunner/parser"
@@ -29,18 +28,18 @@ func main() {
 
 	r.Use(cors.Default())
 	// parseCVE("parser/cve/cve.json")
-	/*parser.ParseCVE("parser/cve/cve.json")
-	log.Printf("%v", parser.Database.FindCve(parser.CPE{
-		CPEVersion: "2.3",
-		Vendor:     "apache",
-		Product:    "http_server",
-		Version:    "2.4.48",
-	}))*/
-	if err := parser.ParseBDU("parser/bdu/export.xml"); err != nil {
-		log.Printf("%s", err)
-	} else {
-		log.Printf("Succesfully parsed BDU")
-	}
+	parser.ParseCVE("parser/cve/cve.json")
+	// log.Printf("%v", parser.Database.FindCve(parser.CPE{
+	// 	CPEVersion: "2.3",
+	// 	Vendor:     "apache",
+	// 	Product:    "http_server",
+	// 	Version:    "2.4.48",
+	// }))
+	// if err := parser.ParseBDU("parser/bdu/export.xml"); err != nil {
+	// 	log.Printf("%s", err)
+	// } else {
+	// 	log.Printf("Succesfully parsed BDU")
+	// }
 	// Группа для работы с хостами (Hosts)
 	hostRoutes := r.Group("/api/v1/host")
 	{
@@ -115,5 +114,6 @@ func main() {
 	r.GET("/api/v1/client", controllers.HandleClientSocketConnection)
 	// Запуск сервера на порту 3001
 	//r.Run(":3001")
-	r.RunTLS(":3002", "certs/ServerCert.crt", "certs/ServerCertKey.pem")
+	r.Run(":3002")
+	//r.RunTLS(":3002", "certs/ServerCert.crt", "certs/ServerCertKey.pem")
 }
