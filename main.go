@@ -41,25 +41,22 @@ func main() {
 	// 	log.Printf("Succesfully parsed BDU")
 	// }
 	// Группа для работы с хостами (Hosts)
-	hostRoutes := r.Group("/api/v1/host")
-	{
-		// POST /api/v1/host - Создать хост
-		hostRoutes.POST("/", controllers.CreateHost)
+	// POST /api/v1/host - Создать хост
+	r.POST("/api/v1/host", controllers.CreateHost)
 
-		// GET /api/v1/host - Получить все хосты
-		hostRoutes.GET("/", controllers.GetAllHost)
+	// GET /api/v1/host - Получить все хосты
+	r.GET("/api/v1/host", controllers.GetAllHost)
 
-		// GET /api/v1/host/search?ip=1.2.3.4 - Найти хост по IP
-		hostRoutes.GET("/search", controllers.GetHostByID)
+	// GET /api/v1/host/search?ip=1.2.3.4 - Найти хост по IP
+	r.GET("/api/v1/host/search", controllers.GetHostByID)
 
-		// PUT /api/v1/host/:id - Обновить хост по ID
-		hostRoutes.PUT("/:id", controllers.UpdateHost)
+	// PUT /api/v1/host/:id - Обновить хост по ID
+	r.PUT("/api/v1/host/:id", controllers.UpdateHost)
 
-		// DELETE /api/v1/host/:id - Удалить хост по ID
-		hostRoutes.DELETE("/:id", controllers.DeleteHost)
+	// DELETE /api/v1/host/:id - Удалить хост по ID
+	r.DELETE("/api/v1/host/:id", controllers.DeleteHost)
 
-		hostRoutes.PATCH("/name", controllers.ChangeHostName)
-	}
+	r.PATCH("/api/v1/host/name", controllers.ChangeHostName)
 
 	// Эндпоинты для работы с группами (Groups)
 	groupRoutes := r.Group("/api/v1/group")
