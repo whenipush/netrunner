@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"netrunner/controllers"
 	"netrunner/database"
-	"netrunner/parser"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,7 +27,7 @@ func main() {
 
 	r.Use(cors.Default())
 	// parseCVE("parser/cve/cve.json")
-	parser.ParseCVE("parser/cve/cve.json")
+	//parser.ParseCVE("parser/cve/cve.json")
 	// log.Printf("%v", parser.Database.FindCve(parser.CPE{
 	// 	CPEVersion: "2.3",
 	// 	Vendor:     "apache",

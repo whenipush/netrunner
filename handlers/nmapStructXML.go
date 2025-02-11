@@ -351,8 +351,8 @@ type HostStats struct {
 // Parse takes a byte array of nmap xml data and unmarshals it into an
 // NmapRun struct. All elements are returned as strings, it is up to the caller
 // to check and cast them to the proper type.
-func Parse(content []byte) (*NmapRun, error) {
-	r := &NmapRun{}
-	err := xml.Unmarshal(content, r)
+func Parse(content []byte) (NmapRun, error) {
+	r := NmapRun{}
+	err := xml.Unmarshal(content, &r)
 	return r, err
 }
