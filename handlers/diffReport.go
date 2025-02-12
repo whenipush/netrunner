@@ -41,7 +41,8 @@ func (p *PentestReportController) diffReport() map[string]PentestDiff {
 		// Если задачи не было до этого то все текущие уязвимости новые
 		if len(hostDB.TaskList) < 2 {
 			diff[host.Ip] = PentestDiff{
-				Added: host.Vulns,
+				Added:   host.Vulns,
+				Removed: map[string]PentestVulns{},
 			}
 		} else {
 			last_task := hostDB.TaskList[len(hostDB.TaskList)-2]
