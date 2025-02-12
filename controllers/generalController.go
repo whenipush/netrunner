@@ -19,6 +19,13 @@ var (
 	mu        = &sync.Mutex{}                  // Мьютекс для синхронизации
 )
 
+func GeneralRoot(c *gin.Context) {
+	c.JSON(200, map[string]interface{}{
+		"netrunnerVersion": "0.1.0",
+		"netrunnerStatus":  "up",
+	})
+}
+
 // HandleWebSocket обрабатывает WebSocket-соединения
 func HandleWebSocket(c *gin.Context) {
 	upgrader := websocket.Upgrader{

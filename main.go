@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"netrunner/controllers"
 	"netrunner/database"
+	"netrunner/parser"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ func main() {
 
 	r.Use(cors.Default())
 	// parseCVE("parser/cve/cve.json")
-	//parser.ParseCVE("parser/cve/cve.json")
+	parser.ParseCVE("parser/cve/cve.json")
 	// log.Printf("%v", parser.Database.FindCve(parser.CPE{
 	// 	CPEVersion: "2.3",
 	// 	Vendor:     "apache",
@@ -41,6 +42,8 @@ func main() {
 	// }
 	// Группа для работы с хостами (Hosts)
 	// POST /api/v1/host - Создать хост
+	r.GET("/api/v1", controllers.GeneralRoot)
+
 	r.POST("/api/v1/host", controllers.CreateHost)
 
 	// GET /api/v1/host - Получить все хосты
