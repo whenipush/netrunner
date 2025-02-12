@@ -1,0 +1,55 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+*.out
+*.pid
+*.tmp
+*.cache
+*.swp
+*.swo
+
+# Golang
+*.exe
+*.test
+*.out
+*.so
+*.dll
+*.dylib
+*.a
+*.o
+*.cgo
+*.h
+
+# Goland IDE
+.idea/
+*.iml
+
+# Vendor Directory (if not managed by Go modules)
+/vendor/
+
+# Binaries for programs and plugins
+bin/
+
+# Database files
+database.db
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.cover
+
+# Editor backups and temporary files
+*~
+*.swp
+
+# Go workspace file
+go.work
+
+
+report/
+scripts/
+certs/
+parser/bdu
+parser/cve
