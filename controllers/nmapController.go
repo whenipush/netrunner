@@ -8,6 +8,7 @@ import (
 	"netrunner/models"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -37,7 +38,12 @@ func executeNmap(task models.TaskStatus, params NmapParams) error {
 		command = fmt.Sprintf("nmap -sV --stats-every 5s -p %s --script=%s %s -oX %s", params.Ports, params.Script, ip, report)
 	}
 
-	cmd := exec.Command("powershell", "-Command", command)
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("powershell", "-Command", command)
+	} else if runtime.GOOS == "linux" {
+		cmd = exec.Command("sh", "-c", command)
+	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)

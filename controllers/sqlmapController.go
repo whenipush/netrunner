@@ -6,6 +6,7 @@ import (
 	"netrunner/database"
 	"netrunner/models"
 	"os/exec"
+	"runtime"
 )
 
 // TODO: Доделать SQLMAP
@@ -24,7 +25,12 @@ func RunSQL(task models.TaskStatus, params SQLMapParams) error {
 	if params.Cookies != "" {
 		command += fmt.Sprintf(" --cookie='%s'", params.Cookies)
 	}
-	cmd := exec.Command("sh", "-c", command)
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("powershell", "-Command", command)
+	} else if runtime.GOOS == "linux" {
+		cmd = exec.Command("sh", "-c", command)
+	}
 
 	if output, err := cmd.CombinedOutput(); err != nil {
 		log.Printf("Ошибка выполнения SQLMap: %s", output)
