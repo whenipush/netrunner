@@ -3,11 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"netrunner/database"
 	"netrunner/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetTaskStatus(c *gin.Context) {
@@ -97,6 +98,11 @@ type DDosParams struct {
 type PentestParams struct {
 	Ports string `json:"ports"`
 	Speed string `json:"speed"`
+}
+
+type NetworkScanParams struct {
+	NetworkBaseAddress string `json:"networkAddress"`
+	Speed              string `json:"speed"`
 }
 
 // decodeParams декодирует JSON-параметры задачи
@@ -217,7 +223,14 @@ func executeTask(task models.TaskStatus) error {
 		}
 		log.Printf("Выполняется задача Pentest с параметрами: %+v", params)
 		return ExecutePentest(task, params)
-
+	case "networkscan":
+		var params NetworkScanParams
+		if err := decodeParams(task, &params); err != nil {
+			database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
+			return err
+		}
+		log.Printf("Выполняется задача Network Scan с параметрами: %+v", params)
+		return ExecuteNetworkScan(task, params)
 	default:
 		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
 		return fmt.Errorf("unsupported task type: %s", task.Type)
