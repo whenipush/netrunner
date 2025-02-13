@@ -76,7 +76,7 @@ func ExecuteNetworkScan(task models.TaskStatus, params NetworkScanParams) error 
 		return fmt.Errorf("network scan execution failed: %v", err)
 	}
 
-	if err := handlers.ProcessNetworkScan(report); err != nil {
+	if err := handlers.ProcessNetworkScan(task); err != nil {
 		database.DB.Model(&models.TaskStatus{}).Where("id = ?", task.ID).Update("status", StatusError)
 		return fmt.Errorf("failed to process Network Scan report: %v", err)
 	}
