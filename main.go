@@ -27,21 +27,7 @@ func main() {
 	}
 
 	r.Use(cors.Default())
-	// parseCVE("parser/cve/cve.json")
 	parser.ParseCVE("parser/cve/cve.json")
-	// log.Printf("%v", parser.Database.FindCve(parser.CPE{
-	// 	CPEVersion: "2.3",
-	// 	Vendor:     "apache",
-	// 	Product:    "http_server",
-	// 	Version:    "2.4.48",
-	// }))
-	// if err := parser.ParseBDU("parser/bdu/export.xml"); err != nil {
-	// 	log.Printf("%s", err)
-	// } else {
-	// 	log.Printf("Succesfully parsed BDU")
-	// }
-	// Группа для работы с хостами (Hosts)
-	// POST /api/v1/host - Создать хост
 	r.GET("/api/v1", controllers.GeneralRoot)
 
 	r.POST("/api/v1/host", controllers.CreateHost)
@@ -103,6 +89,7 @@ func main() {
 
 	// GET /api/v1/pentest/:number_task - Получить отчет пентеста
 	r.GET("/api/v1/pentest/:number_task", controllers.GetPentestJsonByNumberTask)
+	r.GET("/api/v1/networkscan/:number_task", controllers.GetNetworkJsonByNumberTask)
 
 	// WebSocket подключение
 	// GET /api/v1/ws - Подключение WebSocket

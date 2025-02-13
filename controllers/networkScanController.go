@@ -4,13 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"net/http"
 	"netrunner/database"
 	"netrunner/handlers"
 	"netrunner/models"
+	"os"
 	"os/exec"
 	"regexp"
 	"runtime"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func ExecuteNetworkScan(task models.TaskStatus, params NetworkScanParams) error {
@@ -85,4 +89,24 @@ func ExecuteNetworkScan(task models.TaskStatus, params NetworkScanParams) error 
 	BroadcastTask(task)
 
 	return nil
+}
+
+func GetNetworkJsonByNumberTask(c *gin.Context) {
+	var task models.TaskStatus
+	numberTask := c.Param("number_task")
+
+	if err := database.DB.Where("number_task = ?", numberTask).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+		return
+	}
+
+	report := fmt.Sprintf("report/networkscan/%s.xml.json", task.NumberTask)
+	file, err := os.ReadFile(report)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "Отчет не найден"})
+		return
+	}
+
+	c.Data(http.StatusOK, "application/json", []byte(file))
+
 }
