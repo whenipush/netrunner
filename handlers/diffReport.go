@@ -45,19 +45,30 @@ func (p *PentestReportController) diffReport() map[string]PentestDiff {
 				Removed: map[string]PentestVulns{},
 			}
 		} else {
-			last_task := hostDB.TaskList[len(hostDB.TaskList)-2]
-			file, err := os.ReadFile(fmt.Sprintf("report/pentest/%s.xml.json", last_task.NumberTask))
-			if err != nil {
-				log.Printf("[diffReport] Failed to read report file: %v", err)
-				continue
+			for i := 2; i <= len(hostDB.TaskList); i++ {
+				last_task := hostDB.TaskList[len(hostDB.TaskList)-i]
+				file, err := os.ReadFile(fmt.Sprintf("report/pentest/%s.xml.json", last_task.NumberTask))
+				if err != nil {
+					log.Printf("[diffReport] Failed to read report file: %v", err)
+					if i == len(hostDB.TaskList) {
+						log.Printf("[diffReport] Failed to read all files for host %s appending all vulns", host.Ip)
+						diff[host.Ip] = PentestDiff{
+							Added:   host.Vulns,
+							Removed: map[string]PentestVulns{},
+						}
+					}
+					continue
+				} else {
+					var file_data PentestReport
+					err = json.Unmarshal(file, &file_data)
+					if err != nil {
+						log.Printf("[diffReport] Failed to parse report file: %v", err)
+						continue
+					}
+					diff[host.Ip] = diffReports(file_data, p.report, host.Ip)
+				}
 			}
-			var file_data PentestReport
-			err = json.Unmarshal(file, &file_data)
-			if err != nil {
-				log.Printf("[diffReport] Failed to parse report file: %v", err)
-				continue
-			}
-			diff[host.Ip] = diffReports(file_data, p.report, host.Ip)
+
 		}
 	}
 	return diff
