@@ -21,7 +21,7 @@ var Database VulnDatabase = make(VulnDatabase)
 //var VulnDatabase map[string]Vulnerability = make(map[string]Vulnerability)
 
 type Vulnerability struct {
-	Id               string           `json:"id"`
+	ID               string           `json:"id"`
 	Type             string           `json:"type"`
 	CWE              []string         `json:"cwe"`
 	Descrption       string           `json:"description"`
@@ -84,10 +84,11 @@ func (c *CPEConfiguration) UnmarshalJSON(data []byte) error {
 }
 
 type CPE struct {
-	CPEVersion string
-	Vendor     string
-	Product    string
-	Version    string
+	ID         uint   `gorm:"primarykey"`
+	CPEVersion string `gorm:"type:varchar(16)"`
+	Vendor     string `gorm:"type:varchar(256)"`
+	Product    string `gorm:"type:varchar(256)"`
+	Version    string `gorm:"type:varchar(256)"`
 }
 
 func NewCpe(str string) (*CPE, error) {
@@ -112,7 +113,7 @@ func NewCpe(str string) (*CPE, error) {
 			Vendor:     tokens[2],
 			Product:    tokens[3],
 		}
-		if len(tokens) == 5 {
+		if len(tokens) >= 5 {
 			c.Version = tokens[4]
 		}
 		return c, nil
@@ -140,18 +141,24 @@ func (c *CPE) UnmarshalJSON(data []byte) error {
 }
 
 type Details struct {
-	Language string `json:"lang"`
-	Text     string `json:"value"`
+	Id       uint `gorm:"primarykey"`
+	VulnId   uint
+	Language string `gorm:"type:varchar(255)" json:"lang"`
+	Text     string `gorm:"type:text" json:"value"`
 }
 
 type CVSS struct {
+	Id       uint `gorm:"primarykey"`
+	VulnId   uint
 	Score    float32 `json:"score"`
-	Severity string  `json:"severity"`
-	Vector   string  `json:"vector"`
-	Version  string  `json:"version"`
+	Severity string  `gorm:"type:varchar(16)" json:"severity"`
+	Vector   string  `gorm:"type:varchar(256)" json:"vector"`
+	Version  string  `gorm:"type:varchar(16)" json:"version"`
 }
 
 type CVSS3 struct {
+	Id                    uint `gorm:"primarykey"`
+	VulnId                uint
 	AttackComplexity      string  `json:"attackComplexity"`
 	AttackVector          string  `json:"attackVector"`
 	AvailabilityImpact    string  `json:"availabilityImpact"`
@@ -163,7 +170,7 @@ type CVSS3 struct {
 	Scope                 string  `json:"scope"`
 	UserInteraction       string  `json:"userInteraction"`
 	VectorString          string  `json:"vectorString"`
-	Version               string  `json:"version"`
+	Version               string  `gorm:"type:varchar(64)" json:"version"`
 }
 
 func ParseCVE(filepath string) {
@@ -188,7 +195,7 @@ func ParseCVE(filepath string) {
 		}
 
 		source := entry.Source
-		Database[source.Id] = source
+		Database[source.ID] = source
 	}
 	log.Printf("Parsed all CVE's")
 }
