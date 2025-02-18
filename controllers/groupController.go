@@ -24,7 +24,7 @@ func CreateGroup(c *gin.Context) {
 }
 
 func GetAllGroup(c *gin.Context) {
-	var groups []models.Group
+	var groups []models.Group = make([]models.Group, 0)
 	if err := database.DB.Find(&groups).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Failed to get groups"})
 		return

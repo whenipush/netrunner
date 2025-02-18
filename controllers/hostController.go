@@ -40,7 +40,7 @@ func CreateHost(c *gin.Context) {
 // GetAllHost - получает все хосты.
 
 func GetAllHost(c *gin.Context) {
-	var hosts []models.Host
+	var hosts []models.Host = make([]models.Host, 0)
 	if err := database.DB.Preload("Groups").Find(&hosts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
