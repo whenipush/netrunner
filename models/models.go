@@ -28,16 +28,18 @@ func (j Json) Value() (driver.Value, error) {
 
 type Group struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Hosts []Host `gorm:"many2many:group_hosts" json:"hosts"`
+	Name        string `gorm:"type:varchar(255)" json:"name"`
+	Description string `gorm:"type:varchar(255)" json:"description"`
+	Hosts       []Host `gorm:"many2many:group_hosts" json:"hosts"`
 }
 
 type Host struct {
 	gorm.Model
-	Name     string       `gorm:"type:varchar(255);unique_index" json:"name"`
-	IP       string       `gorm:"type:varchar(255);unique_index" json:"ip"`
-	Groups   []Group      `gorm:"many2many:group_hosts"`
-	TaskList []TaskStatus `gorm:"many2many:task_hosts" json:"task_list"`
+	Name        string       `gorm:"type:varchar(255);unique" json:"name"`
+	Description string       `gorm:"type:varchar(255)" json:"description"`
+	IP          string       `gorm:"type:varchar(255);unique" json:"ip"`
+	Groups      []Group      `gorm:"many2many:group_hosts"`
+	TaskList    []TaskStatus `gorm:"many2many:task_hosts" json:"task_list"`
 }
 
 type TaskStatus struct {

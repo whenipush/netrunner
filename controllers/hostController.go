@@ -62,24 +62,26 @@ func GetHostByID(c *gin.Context) {
 // UpdateHost - изменяет хост по ID.
 
 func UpdateHost(c *gin.Context) {
-	var host models.Host
-	if err := c.ShouldBindJSON(&host); err != nil {
+	var hostInput models.Host
+	if err := c.ShouldBindJSON(&hostInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id := c.Params.ByName("ip")
+	id := c.Param("id")
+	var host models.Host
 	if err := database.DB.Where("id = ?", id).First(&host).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Host not found"})
 		return
 	}
-
-	if err := database.DB.Save(&host).Error; err != nil {
+	hostInput.ID = host.ID
+	hostInput.CreatedAt = host.CreatedAt
+	if err := database.DB.Save(&hostInput).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, host)
+	c.JSON(http.StatusOK, hostInput)
 }
 
 // DeleteHost - удаляет хост по ID.
