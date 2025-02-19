@@ -15,10 +15,12 @@ type Vulnerability struct {
 	Link        string        `gorm:"type:varchar(255)"`
 	Solutions   []Solutions   `gorm:"foreignKey:VulnId"`
 	Workarounds []Workarounds `gorm:"foreignKey:VulnId"`
+	Exploits    []Exploits    `gorm:"foreignKey:VulnId"`
 }
 type Description parser.Details
 type Solutions parser.Details
 type Workarounds parser.Details
+type Exploits parser.Details
 
 type CWE struct {
 	Id  uint   `gorm:"primarykey"`

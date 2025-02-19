@@ -32,7 +32,7 @@ func Connect() {
 	}
 	// Автоматическая миграция модели
 	DB.AutoMigrate(&models.Host{}, &models.Group{}, &models.TaskStatus{})
-	if err := PostgreDB.AutoMigrate(&models.Vulnerability{}, &models.Description{}, &parser.CPE{}, &models.CWE{}, &models.Solutions{}, &models.Workarounds{}, &parser.CVSS{}, &parser.CVSS3{}); err != nil {
+	if err := PostgreDB.AutoMigrate(&models.Vulnerability{}, &models.Exploits{}, &models.Description{}, &parser.CPE{}, &models.CWE{}, &models.Solutions{}, &models.Workarounds{}, &parser.CVSS{}, &parser.CVSS3{}); err != nil {
 		log.Printf("Error migrating: %v", err)
 	}
 }
