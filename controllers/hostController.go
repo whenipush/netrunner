@@ -95,7 +95,7 @@ func DeleteHost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"id #" + id: "deleted"})
+	c.JSON(http.StatusOK, gin.H{"id": id, "status": "deleted"})
 }
 
 // AddHostToGroup - добавляет хосты к группам.
@@ -143,6 +143,9 @@ func ChangeHostName(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()}) // Ошибка валидации
 		return
 	}
-	database.DB.Model(&models.Host{}).Where("ip = ?", input.Ip).Update("name", input.Name)
+	if err := database.DB.Model(&models.Host{}).Where("ip = ?", input.Ip).Update("name", input.Name).Error; err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(200, gin.H{})
 }
