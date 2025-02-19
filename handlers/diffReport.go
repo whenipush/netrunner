@@ -66,6 +66,7 @@ func (p *PentestReportController) diffReport() map[string]PentestDiff {
 						continue
 					}
 					diff[host.Ip] = diffReports(file_data, p.report, host.Ip)
+					break
 				}
 			}
 
