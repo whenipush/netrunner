@@ -20,10 +20,6 @@ type Description parser.Details
 type Solutions parser.Details
 type Workarounds parser.Details
 
-func LoadDatabase() {
-
-}
-
 type CWE struct {
 	Id  uint   `gorm:"primarykey"`
 	CWE string `gorm:"unique;not null;type:varchar(16)"`
