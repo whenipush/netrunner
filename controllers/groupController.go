@@ -45,24 +45,26 @@ func GetGroupByName(c *gin.Context) {
 }
 
 func UpdateGroup(c *gin.Context) {
-	var group models.Group
-	if err := c.ShouldBindJSON(&group); err != nil {
+	var groupInput models.Group
+	if err := c.ShouldBindJSON(&groupInput); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	id := c.Params.ByName("id")
+	id := c.Param("id")
+	var group models.Group
 	if err := database.DB.Where("id =?", id).First(&group).Error; err != nil {
 		c.JSON(404, gin.H{"error": "Group not found"})
 		return
 	}
-
-	if err := database.DB.Save(&group).Error; err != nil {
+	groupInput.ID = group.ID
+	groupInput.CreatedAt = group.CreatedAt
+	if err := database.DB.Save(&groupInput).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Failed to update group"})
 		return
 	}
 
-	c.JSON(200, group)
+	c.JSON(200, groupInput)
 }
 
 func DeleteGroup(c *gin.Context) {
@@ -74,5 +76,5 @@ func DeleteGroup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"id #" + id: "deleted"})
+	c.JSON(http.StatusOK, gin.H{"id": id, "status": "deleted"})
 }
