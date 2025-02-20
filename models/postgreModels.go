@@ -2,6 +2,8 @@ package models
 
 import (
 	"netrunner/parser"
+
+	"gorm.io/gorm"
 )
 
 type Vulnerability struct {
@@ -25,4 +27,15 @@ type Exploits parser.Details
 type CWE struct {
 	Id  uint   `gorm:"primarykey"`
 	CWE string `gorm:"unique;not null;type:varchar(16)"`
+}
+
+func FindVuln(c parser.CPE) func(*gorm.DB) *gorm.DB {
+	return func(d *gorm.DB) *gorm.DB {
+		return d.Model(&Vulnerability{}).Where("id IN (?)", d.Table("vuln_cpe").
+			Select("vulnerability_id").
+			Where("cpe_id IN (?)", d.Model(&parser.CPE{}).
+				Order("version desc").
+				Select("id").
+				Where("vendor = ? AND product = ? AND version = ?", c.Vendor, c.Product, c.Version)))
+	}
 }
